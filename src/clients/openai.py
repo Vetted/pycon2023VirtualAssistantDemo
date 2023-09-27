@@ -13,7 +13,7 @@ class OpenAIClient:
     def create_chat_completion(
         self, messages: list[dict], model: str = CHAT_COMPLETION_MODEL
     ) -> str:
-        response = openai.Completion.create(
+        response = openai.ChatCompletion.create(
             model=model, temperature=0, messages=messages
         )
         return response["choices"][0]["message"]["content"]  # type: ignore

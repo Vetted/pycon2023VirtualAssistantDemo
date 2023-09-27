@@ -1,26 +1,33 @@
 from src.clients.qdrant import QClient
 from src.clients.openai import OpenAIClient
 from langchain.text_splitter import CharacterTextSplitter
+from src.logger import logger
 
 
 class Embedder:
     vector_db_client = QClient()
     openai_client = OpenAIClient()
 
-    def embed_information(self, collection: str, text: str):
+    def embed_information(self, collection: str, text: str, name: str):
         """Embeds information into the vector database
 
         Args:
             collection (str): Collection to store the information
             text (str): Information to embed
         """
+        logger.info("Recreating collection...")
         self.vector_db_client.recreate_collection(collection=collection)
+        logger.info("Splitting text into chunks...")
         text_chunks = CharacterTextSplitter().split_text(text)
+        logger.info(f"{len(text_chunks)} number of chunks found")
+
         index = 0
         vectors: list[tuple[int, list[float], dict]] = []
         for text_chunk in text_chunks:
+            logger.info(f"Calculating embedding for the text chunk: {index}")
             embedding = self.openai_client.create_embedding(text_chunk)
-            vectors.append((index, embedding, {"content": text_chunk}))
+            vectors.append((index, embedding, {"content": text_chunk, "name": name}))
+            index += 1
 
         self.vector_db_client.upsert_many(
             collection=collection,
