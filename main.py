@@ -21,7 +21,7 @@ def index_documents():
 
 def query_documents():
     while True:
-        question = input("Ask a question, Type 'exit' to exit: ")
+        question = input("\n\nAsk a question, (Type 'exit' to exit).\n\nQuestion: ")
         if question.lower().strip() == "exit":
             break
 
@@ -31,8 +31,12 @@ def query_documents():
 
 
 def main():
-    # index_documents()
-    query_documents()
+    print("\n\nWhat would you like to do?\n1. Index documents\n2. Query documents")
+    choice = input("Enter your choice: ")
+    if choice == "1":
+        index_documents()
+    elif choice == "2":
+        query_documents()
 
 
 if __name__ == "__main__":

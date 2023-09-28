@@ -18,14 +18,18 @@ class Embedder:
         logger.info("Recreating collection...")
         self.vector_db_client.recreate_collection(collection=collection)
         logger.info("Splitting text into chunks...")
-        text_chunks = CharacterTextSplitter().split_text(text)
+        text_chunks = CharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=100,
+        ).split_text(text)
         logger.info(f"{len(text_chunks)} number of chunks found")
-
         index = 0
         vectors: list[tuple[int, list[float], dict]] = []
         for text_chunk in text_chunks:
-            logger.info(f"Calculating embedding for the text chunk: {index}")
-            embedding = self.openai_client.create_embedding(text_chunk)
+            logger.debug(f"Calculating embedding for the text chunk: {index}")
+            logger.debug(f"Text chunk: {text_chunk}")
+            logger.debug("----------------------")
+            embedding = self.openai_client.create_embedding(text_chunk.strip())
             vectors.append((index, embedding, {"content": text_chunk, "name": name}))
             index += 1
 
@@ -33,3 +37,4 @@ class Embedder:
             collection=collection,
             vectors=vectors,
         )
+        logger.info("Successfully indexed information!")
